@@ -5,19 +5,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Loading...</title>
     <script>
-        // Redirect to the dynamically generated PDF URL after a delay
-        setTimeout(() => {
+        // Function to check for the PDF URL in localStorage
+        function checkForPdfUrl() {
             const pdfUrl = localStorage.getItem("pdfUrl");
             if (pdfUrl) {
+                // Redirect to the PDF URL if available
                 window.location.href = pdfUrl;
             } else {
-                document.body.innerHTML += "<p>Error: PDF link not found.</p>";
+                // Retry after a short delay
+                setTimeout(checkForPdfUrl, 1000); // Check every 1 second
             }
-        }, 5000); // 5-second delay
+        }
+
+        // Start checking for the PDF URL as soon as the page loads
+        window.onload = checkForPdfUrl;
     </script>
 </head>
 <body>
     <h1>Your PDF is being prepared...</h1>
-    <p>Please wait while we generate your document. You will be redirected shortly.</p>
+    <p>Please wait while we generate your document. You will be redirected as soon as it is ready.</p>
 </body>
 </html>
