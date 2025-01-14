@@ -5,20 +5,31 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Loading...</title>
     <script>
-        // Function to check for the PDF URL in localStorage
-        function checkForPdfUrl() {
-            const pdfUrl = localStorage.getItem("pdfUrl");
-            if (pdfUrl) {
-                // Redirect to the PDF URL if available
-                window.location.href = pdfUrl;
-            } else {
-                // Retry after a short delay
-                setTimeout(checkForPdfUrl, 1000); // Check every 1 second
+        async function waitForPdfUrl() {
+            try {
+                // Replace with your Google Apps Script Web App URL
+                const response = await fetch("https://script.google.com/macros/s/AKfycbxsQia2h3F0RtJcrTJqsjvp0U17zKYJbnzDcH2Brk7yXv-w5qKcAmJgIVo1554MPyA6ug/exec", {
+                    method: "GET", // Or POST if necessary
+                });
+
+                if (!response.ok) {
+                    throw new Error("Failed to fetch PDF URL from webhook response.");
+                }
+
+                const data = await response.json();
+                if (data.pdfUrl) {
+                    // Redirect to the PDF URL
+                    window.location.href = data.pdfUrl;
+                } else {
+                    throw new Error("PDF URL not found in webhook response.");
+                }
+            } catch (error) {
+                document.body.innerHTML += `<p>Error: ${error.message}</p>`;
             }
         }
 
-        // Start checking for the PDF URL as soon as the page loads
-        window.onload = checkForPdfUrl;
+        // Start fetching the PDF URL when the page loads
+        window.onload = waitForPdfUrl;
     </script>
 </head>
 <body>
