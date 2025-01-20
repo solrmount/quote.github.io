@@ -1,61 +1,41 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Loading...</title>
-    <script>
-        async function waitForPdfUrl() {
-            // Extract the UniqueId from the URL query string
-            const urlParams = new URLSearchParams(window.location.search);
-            const uniqueId = urlParams.get("UniqueId");
+async function waitForPdfUrl() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const uniqueId = urlParams.get("UniqueId");
 
-            if (!uniqueId) {
-                document.body.innerHTML += `<p>Error: Unique ID is missing in the URL.</p>`;
-                return;
+    if (!uniqueId) {
+        document.body.innerHTML += `<p>Error: Unique ID is missing in the URL.</p>`;
+        return;
+    }
+
+    const pollInterval = 5000; // Poll every 5 seconds
+
+    while (true) {
+        try {
+            const response = await fetch("https://script.google.com/macros/s/YOUR_WEB_APP_ID/exec", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    action: "get_pdf_url",
+                    unique_id: uniqueId
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP Error ${response.status}: ${response.statusText}`);
             }
 
-            const pollInterval = 5000; // Poll every 5 seconds
-
-            while (true) {
-                try {
-                    // Replace YOUR_GOOGLE_SCRIPT_URL with your actual Apps Script URL
-                    const response = await fetch("https://script.google.com/macros/s/AKfycbxsQia2h3F0RtJcrTJqsjvp0U17zKYJbnzDcH2Brk7yXv-w5qKcAmJgIVo1554MPyA6ug/exec", {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({
-                            action: "get_pdf_url",
-                            unique_id: uniqueId
-                        })
-                    });
-
-                    if (!response.ok) {
-                        throw new Error("Failed to fetch PDF URL.");
-                    }
-
-                    const data = await response.json();
-                    if (data.pdfUrl) {
-                        // Redirect to the PDF URL when ready
-                        window.location.href = data.pdfUrl;
-                        break;
-                    } else {
-                        console.log("PDF not ready yet. Retrying...");
-                        await new Promise(resolve => setTimeout(resolve, pollInterval));
-                    }
-                } catch (error) {
-                    document.body.innerHTML += `<p>Error: ${error.message}</p>`;
-                    console.error(error);
-                    await new Promise(resolve => setTimeout(resolve, pollInterval)); // Retry on failure
-                }
+            const data = await response.json();
+            if (data.pdfUrl) {
+                window.location.href = data.pdfUrl;
+                break;
+            } else {
+                console.log("PDF not ready yet. Retrying...");
+                await new Promise(resolve => setTimeout(resolve, pollInterval));
             }
+        } catch (error) {
+            document.body.innerHTML += `<p>Error: ${error.message}</p>`;
+            console.error(error);
+            await new Promise(resolve => setTimeout(resolve, pollInterval)); // Retry on failure
         }
-
-        // Start checking for the PDF URL when the page loads
-        window.onload = waitForPdfUrl;
-    </script>
-</head>
-<body>
-    <h1>Your PDF is being prepared...</h1>
-    <p>Please wait while we generate your document. You will be redirected shortly.</p>
-</body>
-</html>
+    }
+}
