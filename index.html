@@ -6,41 +6,35 @@
     <title>Loading...</title>
     <script>
         async function waitForPdfUrl() {
-            // Extract the unique ID from the URL query string
+            // Extract UniqueId from the URL query string
             const urlParams = new URLSearchParams(window.location.search);
             const uniqueId = urlParams.get("UniqueId");
 
             if (!uniqueId) {
-                document.body.innerHTML += `<p>Error: Unique ID is missing in the URL.</p>`;
+                document.body.innerHTML += "<p>Error: Unique ID is missing in the URL.</p>";
                 return;
             }
 
-            const pollInterval = 5000; // Poll every 5 seconds
+            const endpoint = "https://script.google.com/macros/s/YOUR_WEB_APP_ID/exec";
+            const pollInterval = 5000;
 
             while (true) {
                 try {
-                    // Send a GET request to the Apps Script Web App
-                    const response = await fetch(
-                        `https://script.google.com/macros/s/AKfycbxsQia2h3F0RtJcrTJqsjvp0U17zKYJbnzDcH2Brk7yXv-w5qKcAmJgIVo1554MPyA6ug/exec?unique_id=${uniqueId}`
-                    );
-
+                    const response = await fetch(`${endpoint}?UniqueId=${uniqueId}`);
                     if (!response.ok) {
-                        throw new Error(`HTTP Error ${response.status}: ${response.statusText}`);
+                        throw new Error(`HTTP Error ${response.status}`);
                     }
 
                     const data = await response.json();
-                    if (data.pdfUrl) {
-                        // Redirect to the PDF URL if ready
+                    if (data.success && data.pdfUrl) {
                         window.location.href = data.pdfUrl;
                         break;
                     } else {
-                        console.log("PDF not ready yet. Retrying...");
+                        console.log("PDF not ready. Retrying...");
                         await new Promise(resolve => setTimeout(resolve, pollInterval));
                     }
                 } catch (error) {
-                    if (!document.getElementById("errorMessage")) {
-                        document.body.innerHTML += `<p id="errorMessage" style="color: red;">Error: ${error.message}</p>`;
-                    }
+                    document.body.innerHTML += `<p>Error: ${error.message}</p>`;
                     console.error(error);
                     await new Promise(resolve => setTimeout(resolve, pollInterval));
                 }
