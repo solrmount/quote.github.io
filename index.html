@@ -6,38 +6,38 @@
     <title>Loading...</title>
     <script>
         async function waitForPdfUrl() {
-            // Extract UniqueId from the URL query string
-            const urlParams = new URLSearchParams(window.location.search);
-            const uniqueId = urlParams.get("UniqueId");
+            try {
+                // Extract UniqueId from the URL query string
+                const urlParams = new URLSearchParams(window.location.search);
+                const uniqueId = urlParams.get("UniqueId");
 
-            if (!uniqueId) {
-                document.body.innerHTML += "<p>Error: Unique ID is missing in the URL.</p>";
-                return;
-            }
-
-            const endpoint = "https://script.google.com/macros/s/AKfycbxsQia2h3F0RtJcrTJqsjvp0U17zKYJbnzDcH2Brk7yXv-w5qKcAmJgIVo1554MPyA6ug/exec";
-            const pollInterval = 5000;
-
-            while (true) {
-                try {
-                    const response = await fetch(`${endpoint}?UniqueId=${uniqueId}`);
-                    if (!response.ok) {
-                        throw new Error(`HTTP Error ${response.status}`);
-                    }
-
-                    const data = await response.json();
-                    if (data.success && data.pdfUrl) {
-                        window.location.href = data.pdfUrl;
-                        break;
-                    } else {
-                        console.log("PDF not ready. Retrying...");
-                        await new Promise(resolve => setTimeout(resolve, pollInterval));
-                    }
-                } catch (error) {
-                    document.body.innerHTML += `<p>Error: ${error.message}</p>`;
-                    console.error(error);
-                    await new Promise(resolve => setTimeout(resolve, pollInterval));
+                if (!uniqueId) {
+                    throw new Error("Unique ID is missing in the URL.");
                 }
+
+                console.log("Unique ID found:", uniqueId); // Debugging
+
+                // Cloudflare Worker Proxy URL
+                const proxyEndpoint = "https://<your-worker-name>.<your-subdomain>.workers.dev";
+                const response = await fetch(`${proxyEndpoint}?UniqueId=${uniqueId}`);
+
+                if (!response.ok) {
+                    throw new Error(`HTTP Error: ${response.status}`);
+                }
+
+                const data = await response.json();
+                console.log("Response data:", data); // Debugging
+
+                if (data.success && data.pdfUrl) {
+                    // Redirect to the PDF
+                    window.location.href = data.pdfUrl;
+                } else {
+                    console.log("PDF not ready. Retrying...");
+                    setTimeout(waitForPdfUrl, 5000); // Retry after 5 seconds
+                }
+            } catch (error) {
+                document.body.innerHTML += `<p style="color: red;">Error: ${error.message}</p>`;
+                console.error(error);
             }
         }
 
@@ -46,6 +46,6 @@
 </head>
 <body>
     <h1>Your PDF is being prepared...</h1>
-    <p>Please wait while we generate your document. You will be redirected as soon as it is ready.</p>
+    <p>Please wait while we generate your document. You will be redirected shortly.</p>
 </body>
 </html>
