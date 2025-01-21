@@ -18,7 +18,7 @@
                 console.log("Unique ID found:", uniqueId); // Debugging
 
                 // Cloudflare Worker Proxy URL
-                const proxyEndpoint = "https://<your-worker-name>.<your-subdomain>.workers.dev";
+                const proxyEndpoint = "https://solrmountcalculator.charlie-102.workers.dev/";
                 const response = await fetch(`${proxyEndpoint}?UniqueId=${uniqueId}`);
 
                 if (!response.ok) {
