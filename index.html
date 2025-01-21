@@ -16,7 +16,7 @@
 
         const data = await response.json();
         if (data.success && data.pdfUrl) {
-          window.location.href = data.pdfUrl;
+          window.location.href = data.pdfUrl; // Redirect to the PDF URL
         } else {
           throw new Error("PDF URL not found.");
         }
