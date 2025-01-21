@@ -6,38 +6,36 @@
     <title>Loading...</title>
     <script>
         async function waitForPdfUrl() {
-            try {
-                // Extract UniqueId from the URL query string
-                const urlParams = new URLSearchParams(window.location.search);
-                const uniqueId = urlParams.get("UniqueId");
+            const urlParams = new URLSearchParams(window.location.search);
+            const uniqueId = urlParams.get("UniqueId");
 
-                if (!uniqueId) {
-                    throw new Error("Unique ID is missing in the URL.");
+            if (!uniqueId) {
+                document.body.innerHTML += `<p style="color: red;">Error: Unique ID is missing in the URL.</p>`;
+                return;
+            }
+
+            const proxyEndpoint = "https://solrmountcalculator.charlie-102.workers.dev/";
+
+            while (true) {
+                try {
+                    const response = await fetch(`${proxyEndpoint}?UniqueId=${uniqueId}`);
+                    if (!response.ok) {
+                        throw new Error(`HTTP Error: ${response.status}`);
+                    }
+
+                    const data = await response.json();
+                    if (data.pdfUrl) {
+                        window.location.href = data.pdfUrl;
+                        break;
+                    } else {
+                        console.log("PDF not ready. Retrying...");
+                        await new Promise(resolve => setTimeout(resolve, 5000)); // Retry after 5 seconds
+                    }
+                } catch (error) {
+                    document.body.innerHTML += `<p style="color: red;">Error: ${error.message}</p>`;
+                    console.error(error);
+                    break;
                 }
-
-                console.log("Unique ID found:", uniqueId); // Debugging
-
-                // Cloudflare Worker Proxy URL
-                const proxyEndpoint = "https://solrmountcalculator.charlie-102.workers.dev/";
-                const response = await fetch(`${proxyEndpoint}?UniqueId=${uniqueId}`);
-
-                if (!response.ok) {
-                    throw new Error(`HTTP Error: ${response.status}`);
-                }
-
-                const data = await response.json();
-                console.log("Response data:", data); // Debugging
-
-                if (data.success && data.pdfUrl) {
-                    // Redirect to the PDF
-                    window.location.href = data.pdfUrl;
-                } else {
-                    console.log("PDF not ready. Retrying...");
-                    setTimeout(waitForPdfUrl, 5000); // Retry after 5 seconds
-                }
-            } catch (error) {
-                document.body.innerHTML += `<p style="color: red;">Error: ${error.message}</p>`;
-                console.error(error);
             }
         }
 
@@ -46,6 +44,6 @@
 </head>
 <body>
     <h1>Your PDF is being prepared...</h1>
-    <p>Please wait while we generate your document. You will be redirected shortly.</p>
+    <p>Please wait while we generate your document. You will be redirected as soon as it is ready.</p>
 </body>
 </html>
