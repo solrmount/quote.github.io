@@ -1,49 +1,36 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Loading...</title>
-    <script>
-        async function waitForPdfUrl() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const uniqueId = urlParams.get("UniqueId");
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Loading...</title>
+  <script>
+    async function waitForPdfUrl() {
+      try {
+        const endpoint = "https://solrmountcalculator.charlie-102.workers.dev";
+        const response = await fetch(endpoint, { method: "POST" });
 
-            if (!uniqueId) {
-                document.body.innerHTML += `<p style="color: red;">Error: Unique ID is missing in the URL.</p>`;
-                return;
-            }
-
-            const proxyEndpoint = "https://solrmountcalculator.charlie-102.workers.dev/";
-
-            while (true) {
-                try {
-                    const response = await fetch(`${proxyEndpoint}?UniqueId=${uniqueId}`);
-                    if (!response.ok) {
-                        throw new Error(`HTTP Error: ${response.status}`);
-                    }
-
-                    const data = await response.json();
-                    if (data.pdfUrl) {
-                        window.location.href = data.pdfUrl;
-                        break;
-                    } else {
-                        console.log("PDF not ready. Retrying...");
-                        await new Promise(resolve => setTimeout(resolve, 5000)); // Retry after 5 seconds
-                    }
-                } catch (error) {
-                    document.body.innerHTML += `<p style="color: red;">Error: ${error.message}</p>`;
-                    console.error(error);
-                    break;
-                }
-            }
+        if (!response.ok) {
+          throw new Error(`HTTP Error ${response.status}`);
         }
 
-        window.onload = waitForPdfUrl;
-    </script>
+        const data = await response.json();
+        if (data.success && data.pdfUrl) {
+          window.location.href = data.pdfUrl;
+        } else {
+          throw new Error("PDF URL not found.");
+        }
+      } catch (error) {
+        document.body.innerHTML += `<p style="color: red;">Error: ${error.message}</p>`;
+        console.error(error.message);
+      }
+    }
+
+    window.onload = waitForPdfUrl;
+  </script>
 </head>
 <body>
-    <h1>Your PDF is being prepared...</h1>
-    <p>Please wait while we generate your document. You will be redirected as soon as it is ready.</p>
+  <h1>Your PDF is being prepared...</h1>
+  <p>Please wait while we generate your document. You will be redirected shortly.</p>
 </body>
 </html>
