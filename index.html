@@ -7,7 +7,7 @@
   <script>
     async function fetchPDF() {
       try {
-        let response = await fetch("https://your-cloudflare-worker-url.workers.dev/");
+        let response = await fetch("https://solrmountcalculator.charlie-102.workers.dev/");
         let data = await response.json();
 
         if (data.pdfUrl) {
