@@ -3,41 +3,27 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Redirecting to Your PDF</title>
+  <title>Loading...</title>
   <script>
-    async function redirectToPdf() {
-      const endpoint = "https://solrmountcalculator.charlie-102.workers.dev/";
-
+    async function fetchPDF() {
       try {
-        const response = await fetch(endpoint, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({}),
-        });
-
-        if (!response.ok) {
-          throw new Error(`HTTP Error ${response.status}`);
-        }
-
-        const data = await response.json();
+        let response = await fetch("https://your-cloudflare-worker-url.workers.dev/");
+        let data = await response.json();
 
         if (data.pdfUrl) {
-          window.location.href = data.pdfUrl;
+          window.location.href = data.pdfUrl;  // Automatically download the PDF
         } else {
-          document.body.innerHTML = `<h1>Error: ${data.error || "PDF not found."}</h1>`;
+          document.getElementById("message").innerText = "Error fetching PDF!";
         }
       } catch (error) {
-        document.body.innerHTML = `<h1>Error: ${error.message}</h1>`;
+        document.getElementById("message").innerText = "Error loading PDF!";
       }
     }
 
-    window.onload = redirectToPdf;
+    window.onload = fetchPDF;
   </script>
 </head>
 <body>
-  <h1>Your PDF is being prepared...</h1>
-  <p>You will be redirected shortly. If not, please try again later.</p>
+  <h1 id="message">Processing your quote... Please wait.</h1>
 </body>
 </html>
