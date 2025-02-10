@@ -3,27 +3,16 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Redirecting to Your PDF</title>
+  <title>Generating PDF...</title>
   <script>
     async function redirectToPdf() {
-      // Retrieve stored webhook data (should be set before redirecting here)
-      const storedData = sessionStorage.getItem("webhookData");
-
-      if (!storedData) {
-        document.body.innerHTML = "<h1>Error: No webhook data found.</h1>";
-        return;
-      }
-
-      // Cloudflare Worker endpoint
       const endpoint = "https://solrmountcalculator.charlie-102.workers.dev/";
 
       try {
         const response = await fetch(endpoint, {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: storedData, // Send the full webhook data
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({})
         });
 
         if (!response.ok) {
@@ -31,9 +20,7 @@
         }
 
         const data = await response.json();
-
         if (data.pdfUrl) {
-          // Redirect to the PDF URL
           window.location.href = data.pdfUrl;
         } else {
           document.body.innerHTML = `<h1>Error: ${data.error || "PDF not found."}</h1>`;
@@ -48,6 +35,5 @@
 </head>
 <body>
   <h1>Your PDF is being prepared...</h1>
-  <p>You will be redirected shortly. If not, please try again later.</p>
 </body>
 </html>
