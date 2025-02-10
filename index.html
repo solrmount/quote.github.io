@@ -6,12 +6,11 @@
   <title>Redirecting to Your PDF</title>
   <script>
     async function redirectToPdf() {
-      // Extract UniqueId from the URL query string
-      const urlParams = new URLSearchParams(window.location.search);
-      const uniqueId = urlParams.get("UniqueId");
+      // Retrieve stored webhook data (should be set before redirecting here)
+      const storedData = sessionStorage.getItem("webhookData");
 
-      if (!uniqueId) {
-        document.body.innerHTML = "<h1>Error: Unique ID is missing in the URL.</h1>";
+      if (!storedData) {
+        document.body.innerHTML = "<h1>Error: No webhook data found.</h1>";
         return;
       }
 
@@ -24,7 +23,7 @@
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ UniqueId: uniqueId }),
+          body: storedData, // Send the full webhook data
         });
 
         if (!response.ok) {
