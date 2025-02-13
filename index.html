@@ -5,9 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Redirecting to Your PDF</title>
   <script>
-    async function redirectToPdf() {
+    async function callabc(){
       console.log("I am here");
       alert("aaa");
+    }
+    async function redirectToPdf() {
+      
       // Extract UniqueId from the URL query string
       const urlParams = new URLSearchParams(window.location.search);
       const uniqueId = urlParams.get("UniqueId");
@@ -46,7 +49,8 @@
       }
     }
 
-    window.onload = redirectToPdf;
+    window.onload = callabc;
+    // window.onload = redirectToPdf;
   </script>
 </head>
 <body>
