@@ -35,7 +35,6 @@
       const endpoint = "https://solrmountcalculator.charlie-102.workers.dev/";
 
       try {
-        document.body.innerHTML = "<h1>I am here</h1>";
         const response = await fetch(endpoint, {
           method: "POST",
           headers: {
@@ -45,7 +44,7 @@
         });
 
         console.log(response, "response");
-  return;
+        return;
         // if (!response.ok) {
         //   throw new Error(HTTP Error ${response.status});
         // }
@@ -56,10 +55,10 @@
           // Redirect to the PDF URL
           window.location.href = data.pdfUrl;
         } else {
-          document.body.innerHTML = '<h1>Error: ${data.error || "PDF not found."}</h1>';
+          document.body.innerHTML = `<h1>Error: ${data.error || "PDF not found."}</h1>`;
         }
       } catch (error) {
-        document.body.innerHTML = <h1>Error: ${error.message}</h1>;
+        document.body.innerHTML = `<h1>Error: ${error.message}</h1>`;
       }
     }
 
