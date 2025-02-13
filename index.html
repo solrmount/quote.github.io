@@ -43,11 +43,9 @@
           body: JSON.stringify({ UniqueId: uniqueId }),
         });
 
-        console.log(response, "response");
-        return;
-        // if (!response.ok) {
-        //   throw new Error(HTTP Error ${response.status});
-        // }
+        if (!response.ok) {
+          throw new Error(HTTP Error ${response.status});
+        }
 
         const data = await response.json();
 
