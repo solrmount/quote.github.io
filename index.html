@@ -6,6 +6,7 @@
   <title>Redirecting to Your PDF</title>
   <script>
     async function redirectToPdf() {
+      console.log("I am here");
       // Extract UniqueId from the URL query string
       const urlParams = new URLSearchParams(window.location.search);
       const uniqueId = urlParams.get("UniqueId");
