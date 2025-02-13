@@ -31,12 +31,11 @@
         return;
       }
 
-      return;
-
       // Cloudflare Worker endpoint
       const endpoint = "https://solrmountcalculator.charlie-102.workers.dev/";
 
       try {
+        document.body.innerHTML = "<h1>I am here</h1>";
         const response = await fetch(endpoint, {
           method: "POST",
           headers: {
@@ -45,9 +44,11 @@
           body: JSON.stringify({ UniqueId: uniqueId }),
         });
 
-        if (!response.ok) {
-          throw new Error(HTTP Error ${response.status});
-        }
+        console.log(response, "response");
+  return;
+        // if (!response.ok) {
+        //   throw new Error(HTTP Error ${response.status});
+        // }
 
         const data = await response.json();
 
