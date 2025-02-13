@@ -8,6 +8,16 @@
     async function callabc(){
       console.log("I am here");
       alert("aaa");
+
+      const urlParams = new URLSearchParams(window.location.search);
+      const uniqueId = urlParams.get("UniqueId");
+      console.log("urlParams", urlParams);
+      console.log("uniqueId", uniqueId);
+
+      if (!uniqueId) {
+        document.body.innerHTML = "<h1>Error: Unique ID is missing in the URL.</h1>";
+        return;
+      }
     }
     
 
